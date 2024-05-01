@@ -1,0 +1,41 @@
+[INFO]	2024-03-09T16:36:27.182Z	bbec1be2-c468-4f3f-b0aa-c779a58e13af	Sending data to API: [{
+    "customer_id": 91811409,
+    "customer_name": "Ritsa Hightower",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 64444841,
+    "customer_name": "Becky Pak",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 38079848,
+    "customer_name": "Raymond Book",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 104752832,
+    "customer_name": "Jasper Cacioppo",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 23905406,
+    "customer_name": "Dennis Kane",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 38075002,
+    "customer_name": "Alejandro Grove",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 59254130,
+    "customer_name": "Grant Carroll",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 39007820,
+    "customer_name": "Emily Phan",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 91977284,
+    "customer_name": "Roy Skaria",
+    "date": "2024-03-09"
+}, {
+    "customer_id": 107565533,
+    "customer_name": "Liz MacKendrick",
+    "date": "2024-03-09"
+}]

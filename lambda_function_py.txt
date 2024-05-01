@@ -1,0 +1,61 @@
+import json
+import boto3
+import pymysql
+import requests
+from datetime import datetime
+
+def lambda_handler(event, context):
+    # Setup S3 client
+    s3_client = boto3.client('s3')
+    
+    # Get bucket name and file key from the event
+    bucket_name = event['Records'][0]['s3']['bucket']['name']
+    file_key = event['Records'][0]['s3']['object']['key']
+    
+    # Get the JSON file content from S3
+    response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
+    customer_data = json.loads(response['Body'].read().decode('utf-8'))
+    
+    # Extract customer IDs 
+    customer_ids = [item['customerID'] for item in customer_data]
+
+    # Database connection parameters
+    db_params = {
+        'host': 'database-1.c50u6u2iwrr0.us-east-1.rds.amazonaws.com',
+        'user': 'admin',
+        'password': '159951Ppp',
+        'db': 'superstore',
+        'port': 3306,
+        'charset': 'utf8mb4',
+        'cursorclass': pymysql.cursors.DictCursor
+    }
+
+    # Connect to the database
+    connection = pymysql.connect(**db_params)
+    try:
+        with connection.cursor() as cursor:
+            # fetch customer names for the IDs
+            format_strings = ','.join(['%s'] * len(customer_ids))
+            cursor.execute(f"SELECT customerID, CustomerName FROM customers WHERE customerID IN ({format_strings})", tuple(customer_ids))
+            result = cursor.fetchall()
+    finally:
+        connection.close()
+
+    # Prepare data for the API call
+    data_to_send = [{
+        "customer_id": row['customerID'], 
+        "customer_name": row['CustomerName'], 
+        "date": datetime.now().strftime('%Y-%m-%d')
+    } for row in result]
+    
+    # API call
+    response = requests.post('https://virtserver.swaggerhub.com/wcd_de_lab/top10/1.0.0/add', json=data_to_send)
+    if response.status_code == 201:
+        print("Data sent successfully")
+    else:
+        print(f"Failed to send data. Status code: {response.status_code}, Message: {response.text}")
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Lambda function executed successfully')
+    }

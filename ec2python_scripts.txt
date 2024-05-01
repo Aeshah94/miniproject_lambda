@@ -1,0 +1,55 @@
+
+
+------------------------------------------------
+
+import pymysql
+import boto3
+import json
+import os
+
+# Database connection parameters
+db_params = {
+    'host': 'database-1.c50u6u2iwrr0.us-east-1.rds.amazonaws.com',
+    'user': 'admin',
+    'password': '159951Ppp',  
+    'db': 'superstore',
+    'port': 3306,
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor
+}
+
+# SQL query
+sql_query = """
+SELECT customerID, SUM(sales) AS total_sales
+FROM orders
+GROUP BY customerID
+ORDER BY total_sales DESC
+LIMIT 10;
+"""
+
+# Connect to the database
+connection = pymysql.connect(**db_params)
+
+try:
+    with connection.cursor() as cursor:
+        cursor.execute(sql_query)
+        result = cursor.fetchall()  # Fetch all results
+
+    # Define the file path dynamically to save in the home directory
+    home_directory = os.path.expanduser('~')
+    filename = 'top_10_customers.json'
+    full_path = os.path.join(home_directory, filename)
+    
+    # Save the result to a JSON file
+    with open(full_path, 'w') as outfile:
+        json.dump(result, outfile)
+
+finally:
+    connection.close()
+
+# Upload the file to S3
+s3 = boto3.client('s3')
+bucket_name = 'miniprojectaeshah'
+s3.upload_file(full_path, bucket_name, 'input/' + filename)
+
+print("File uploaded successfully to S3")
